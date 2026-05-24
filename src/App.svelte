@@ -1,11 +1,33 @@
 <script lang="ts">
+  import { onMount } from 'svelte'
   import { applyTheme, loadTheme, persistTheme, type Theme } from './theme.js'
   import { apps, patches } from './tiles.js'
+  import { fetchLatestVersion } from './versions.js'
 
   // Initial paint already done by main.ts before mount — this state
   // just tracks the same value so the toggle button knows which icon
   // to draw.
   let theme = $state<Theme>(loadTheme())
+
+  /**
+   * Per-app version map. Three states per entry:
+   *   - `undefined` — still fetching (rendered as nothing → no jump)
+   *   - `null` — fetch returned no version (rare, but possible:
+   *     repo with no releases / no tags / API errored). Renders empty.
+   *   - `string` — display as-is, e.g. `v0.7.0`.
+   */
+  let versions = $state<Record<string, string | null | undefined>>({})
+
+  onMount(() => {
+    // Fire all four requests in parallel; let each tile update as
+    // soon as its own response lands. No spinner — empty space is
+    // less distracting than a flicker on first paint.
+    for (const tile of apps) {
+      fetchLatestVersion(tile.name).then((v) => {
+        versions[tile.name] = v
+      })
+    }
+  })
 
   function toggleTheme(): void {
     theme = theme === 'light' ? 'dark' : 'light'
@@ -75,10 +97,16 @@
   <ul class="tiles tiles--apps">
     {#each apps as tile (tile.href)}
       {@const parts = splitAppName(tile.name)}
+      {@const version = versions[tile.name]}
       <li class="tile tile--app">
         <a href={tile.href} target="_blank" rel="noopener noreferrer">
-          <span class="tile__name tile__name--app">
-            <span>{parts.stem}</span><span class="tile__name-accent">{parts.x}</span>
+          <span class="tile__stack">
+            <span class="tile__name tile__name--app">
+              <span>{parts.stem}</span><span class="tile__name-accent">{parts.x}</span>
+            </span>
+            {#if version}
+              <span class="tile__version">{version}</span>
+            {/if}
           </span>
         </a>
       </li>
@@ -206,6 +234,17 @@
     outline: 2px solid var(--m-light);
     outline-offset: 2px;
   }
+  /* Inner column inside an app tile — stacks the name on top of the
+   * version line. The version reserves no space when unset, so a
+   * still-loading tile centres on the name alone (no jump when the
+   * fetch resolves a moment later — the name shifts up slightly but
+   * the tile itself stays a stable size). */
+  .tile__stack {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
   .tile__name {
     font-weight: 700;
     letter-spacing: -0.3px;
@@ -216,6 +255,16 @@
   }
   .tile__name-accent {
     color: var(--m-red);
+  }
+  .tile__version {
+    font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 12px;
+    color: var(--fg-faint);
+    font-weight: 500;
+    letter-spacing: 0.3px;
+  }
+  .tile--app a:hover .tile__version {
+    color: var(--fg-muted);
   }
 
   /* Patches: smaller tiles, narrower grid (these are secondary
