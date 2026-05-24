@@ -63,8 +63,7 @@ export async function fetchLatestVersion(appName: string): Promise<string | null
 
 function normalize(tag: string): string {
   // GitHub tags vary — "v0.7.0", "0.7.0", "release-0.7.0". Strip the
-  // common prefixes and add a single "v" so all four tiles read the
-  // same way.
-  const cleaned = tag.trim().replace(/^(release[-_]?|v)/i, '')
-  return `v${cleaned}`
+  // common prefixes so all four tiles read the same way as the
+  // in-app version pills (which display the bare semver).
+  return tag.trim().replace(/^(release[-_]?|v)/i, '')
 }
