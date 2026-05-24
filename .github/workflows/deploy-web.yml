@@ -1,0 +1,64 @@
+name: Deploy hub to GitHub Pages
+
+# Push-to-main auto-deploys (the hub is just a static list of links —
+# every change there is publishable), with manual workflow_dispatch
+# kept available for forced redeploys without a code change.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# Required by `actions/deploy-pages`: read the repo, write the Pages
+# artifact, and mint an OIDC token so the deployment is attested to
+# come from this workflow run.
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Only one Pages deploy at a time — let an in-flight deploy finish
+# rather than cancelling it.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.1.2
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Build
+        run: pnpm build
+
+      # GitHub Pages binds the custom subdomain via a `CNAME` file at
+      # the site root. Without it the DNS resolves but Pages 404s.
+      - name: Add CNAME
+        run: echo "hub.bimmerz.app" > dist/CNAME
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

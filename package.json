@@ -1,0 +1,25 @@
+{
+  "name": "bimmerz-hub",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Dashboard launcher for the bimmerz toolchain — links to ediabasx, inpax, ncsx, xbusx, the bimmerz.app site, and the community-patch repos.",
+  "packageManager": "pnpm@11.1.2",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "typecheck": "svelte-check --tsconfig ./tsconfig.json",
+    "clean": "rm -rf dist .turbo *.tsbuildinfo"
+  },
+  "devDependencies": {
+    "@sveltejs/vite-plugin-svelte": "^7.1.2",
+    "svelte": "^5.55.7",
+    "svelte-check": "^4.4.8",
+    "typescript": "^6.0.3",
+    "vite": "^8.0.13"
+  }
+}
