@@ -19,6 +19,7 @@ const repos: Record<string, Repo> = {
   EDIABASX: { owner: 'emdzej', repo: 'ediabasx' },
   INPAX: { owner: 'emdzej', repo: 'inpax' },
   NCSX: { owner: 'emdzej', repo: 'ncsx' },
+  TUNEX: { owner: 'emdzej', repo: 'tunex' },
   XBUSX: { owner: 'emdzej', repo: 'xbusx' },
 }
 
