@@ -36,9 +36,10 @@
   }
 
   /**
-   * Apps named EDIABASX / INPAX / NCSX / XBUSX all share the
-   * "stem + trailing X" pattern — paint the X in M-red to mirror the
-   * accent each individual app's web UI uses for its own title.
+   * Apps named EDIABASX / INPAX / NCSX / NFSX / TUNEX / XBUSX all
+   * share the "stem + trailing X" pattern — paint the X in M-red to
+   * mirror the accent each individual app's web UI uses for its own
+   * title.
    */
   function splitAppName(name: string): { stem: string; x: string } {
     if (name.endsWith('X')) return { stem: name.slice(0, -1), x: 'X' }

@@ -16,6 +16,7 @@ export const apps: AppTile[] = [
   { name: 'EDIABASX', href: 'https://ediabasx.bimmerz.app' },
   { name: 'INPAX', href: 'https://inpax.bimmerz.app' },
   { name: 'NCSX', href: 'https://ncsx.bimmerz.app' },
+  { name: 'NFSX', href: 'https://nfsx.bimmerz.app' },
   { name: 'TUNEX', href: 'https://tunex.bimmerz.app' },
   { name: 'XBUSX', href: 'https://xbusx.bimmerz.app' },
 ]
